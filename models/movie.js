@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
 const {
-  linkFailMsg, NODE_ENV, envProduction, trcFlag, trcMoviesFlag, trcSchValidateFlag,
+  linkFailMsg, NODE_ENV, envProduction, trcFlag, trcMoviesFlag, trcSchValidateFlag, urlValidOptions,
 } = require('../utils/constants');
 const { logPassLint } = require('../utils/miscutils');
 
@@ -32,7 +32,7 @@ const movieSchema = new mongoose.Schema({
     validate: {
       validator(lnk) {
         if (trcFlag && trcMoviesFlag && NODE_ENV !== envProduction) logPassLint(`Movie image link test in schema: ${validator.isURL(lnk)} 4 ${lnk}`, trcSchValidateFlag);
-        return validator.isURL(lnk);
+        return validator.isURL(lnk, urlValidOptions);
       },
       message: linkFailMsg,
     },
@@ -43,7 +43,7 @@ const movieSchema = new mongoose.Schema({
     validate: {
       validator(lnk) {
         if (trcFlag && trcMoviesFlag && NODE_ENV !== envProduction) logPassLint(`Movie trailerLink test in schema: ${validator.isURL(lnk)} 4 ${lnk}`, trcSchValidateFlag);
-        return validator.isURL(lnk);
+        return validator.isURL(lnk, urlValidOptions);
       },
       message: linkFailMsg,
     },
@@ -54,7 +54,7 @@ const movieSchema = new mongoose.Schema({
     validate: {
       validator(lnk) {
         if (trcFlag && trcMoviesFlag && NODE_ENV !== envProduction) logPassLint(`Movie link test in schema: ${validator.isURL(lnk)} 4 ${lnk}`, trcSchValidateFlag);
-        return validator.isURL(lnk);
+        return validator.isURL(lnk, urlValidOptions);
       },
       message: linkFailMsg,
     },

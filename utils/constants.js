@@ -36,7 +36,7 @@ const errTraceFlag = true;
 const reqLogFName = 'request.log';
 const errLogFName = 'error.log';
 
-/* User model config consts */
+/* Mongoose model config consts */
 const strSchMinLen = 2;
 const strSchMaxLen = 30;
 const idSchemaLen = 24;
@@ -44,6 +44,7 @@ const strSchPassLen = 8;
 const emailPattern = /^[a-z0-9]+[a-z0-9\-_.]*@[a-z0-9]+[a-z0-9\-_.]*\.[a-z0-9]+[a-z0-9\-_.]*$/;
 const usrEmailFailMsg = 'Field typed is not a valid e-mail address';
 const linkFailMsg = 'Incorrect link address';
+const urlValidOptions = { protocols: ['http', 'https', 'ftp'], require_tld: true, require_protocol: false };
 
 /* CORS config consts */
 const allowedCors = [ // Массив доменов, с которых разрешены кросс-доменные запросы
@@ -141,6 +142,7 @@ module.exports = {
   idSchemaLen,
   strSchPassLen,
   emailPattern,
+  urlValidOptions,
   usrEmailFailMsg,
   linkFailMsg,
   allowedCors,
