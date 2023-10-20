@@ -44,7 +44,8 @@ const strSchPassLen = 8;
 const emailPattern = /^[a-z0-9]+[a-z0-9\-_.]*@[a-z0-9]+[a-z0-9\-_.]*\.[a-z0-9]+[a-z0-9\-_.]*$/;
 const usrEmailFailMsg = 'Field typed is not a valid e-mail address';
 const linkFailMsg = 'Incorrect link address';
-const urlValidOptions = { protocols: ['http', 'https', 'ftp'], require_tld: true, require_protocol: false };
+/* const urlValidOptions =
+{ protocols: ['http', 'https', 'ftp'], require_tld: true, require_protocol: false }; */
 
 /* CORS config consts */
 const allowedCors = [ // Массив доменов, с которых разрешены кросс-доменные запросы
@@ -142,7 +143,7 @@ module.exports = {
   idSchemaLen,
   strSchPassLen,
   emailPattern,
-  urlValidOptions,
+  // urlValidOptions,
   usrEmailFailMsg,
   linkFailMsg,
   allowedCors,
