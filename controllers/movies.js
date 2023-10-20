@@ -4,22 +4,22 @@ const Forbidden = require('../errors/Forbidden');
 
 const {
   resOkDefault, resOKCreated, errIncorrectData, errDefault, errValidationErr, trcFlag, NODE_ENV,
-  envProduction,
+  envProduction, trcMoviesFlag, errTraceFlag,
 } = require('../utils/constants');
 const { logPassLint } = require('../utils/miscutils');
 
 function getMovies(req, res) {
-  if (trcFlag && NODE_ENV !== envProduction) console.log(`Get movies 4 ${req.user._id}`);
+  if (trcFlag && NODE_ENV !== envProduction) logPassLint(`Get movies 4 ${req.user._id}`, trcMoviesFlag);
   Movie.find({ owner: { $eq: req.user._id } }).then((movieList) => {
     res.status(resOkDefault).send({ data: movieList });
   }).catch((err) => {
-    logPassLint(err, true);
+    logPassLint(err, errTraceFlag);
     res.status(errDefault.num).send({ message: errDefault.msg });
   });
 }
 //
 function createMovie(req, res) {
-  // console.log(`${Object.entries(req.body).join('; ')} / ${req.user._id}`);
+  if (trcFlag && NODE_ENV !== envProduction) logPassLint(`${Object.entries(req.body).join('; ')} / ${req.user._id}`, trcMoviesFlag);
   const {
     country, director, duration, year, description, image, trailerLink, thumbnail,
     owner = req.user._id, movieId, nameRU, nameEN,
@@ -54,15 +54,14 @@ function createMovie(req, res) {
         movieId: movie.movieId,
         nameRU: movie.nameRU,
         nameEN: movie.nameEN,
-        /* _id: movie._id, */
       },
     });
   }).catch((err) => {
     if (err.name === errValidationErr) {
-      logPassLint(`Error ${errIncorrectData.num}: ${err}`, true);
+      logPassLint(`Error ${errIncorrectData.num}: ${err}`, errTraceFlag);
       res.status(errIncorrectData.num).send({ message: errIncorrectData.msg });
     } else {
-      logPassLint(`Error ${errDefault.num}: ${err}`, true);
+      logPassLint(`Error ${errDefault.num}: ${err}`, errTraceFlag);
       res.status(errDefault.num).send({ message: errDefault.msg });
     }
   });
@@ -70,14 +69,14 @@ function createMovie(req, res) {
 
 function deleteMovieById(req, res, next) {
   const { filmId } = req.params;
-  // console.log(`Delete movie by ${filmId}`);
+  if (trcFlag && NODE_ENV !== envProduction) logPassLint(`Delete movie by ${filmId}`, trcMoviesFlag);
   Movie.findById(filmId).then((movie) => {
-    // console.log(`Del movie ${filmId} owned by ${movie.owner} starts 4: ${req.user._id}`);
+    if (trcFlag && NODE_ENV !== envProduction) logPassLint(`Del movie ${filmId} owned by ${movie.owner} starts 4: ${req.user._id}`, trcMoviesFlag);
     if (!movie) return Promise.reject(new NotFound());
     if (String(movie.owner) !== String(req.user._id)) throw new Forbidden();
     Movie.findByIdAndRemove(filmId).then((MongoMovie) => {
       if (!MongoMovie) return Promise.reject(new NotFound());
-      // console.log(`Movie ${filmId} was deleted with status: ${resOkDefault} / ${MongoMovie}`);
+      if (trcFlag && NODE_ENV !== envProduction) logPassLint(`Movie ${filmId} was deleted with status: ${resOkDefault} / ${MongoMovie}`, trcMoviesFlag);
       return res.status(resOkDefault).send({ data: MongoMovie });
     }).catch((err) => {
       next(err);
@@ -90,7 +89,7 @@ function deleteMovieById(req, res, next) {
 
 function updateMovieById(id, updateData, updateOptions = { new: true }) {
   return Movie.findByIdAndUpdate(id, updateData, updateOptions).then((movie) => {
-    // console.log(`Movie after update: ${movie}`);
+    if (trcFlag && NODE_ENV !== envProduction) logPassLint(`Movie after update: ${movie}`, trcMoviesFlag);
     if (!movie) return Promise.reject(new NotFound());
     return Promise.resolve(movie); // res.send({ data: movie });
   }).catch((err) => Promise.reject(err));

@@ -25,9 +25,12 @@ const signUpRoute = '/signup';
 /* Dbg/trace config vars */
 const dbgFlag = true;
 const trcFlag = true;
-const dbgNoCORSFlag = true;
+const dbgNoCORSFlag = false;
 const dbgNoAuthFlag = false;
 const dbgNoLogFlag = false;
+const trcMoviesFlag = true;
+const trcSchValidateFlag = true;
+const errTraceFlag = true;
 
 /* Logging config consts */
 const reqLogFName = 'request.log';
@@ -106,6 +109,7 @@ const errMongoServerError = 'MongoServerError';
 const errName = 'Error';
 const errIllegalArgsPattern = /^Illegal arguments: /;
 const errDuplicateKeyPattern = /^E11000 duplicate key error collection: /;
+
 /* Miscellaneous consts */
 const pswSoltLen = 12;
 
@@ -123,6 +127,9 @@ module.exports = {
   dbgNoCORSFlag,
   dbgNoAuthFlag,
   dbgNoLogFlag,
+  trcMoviesFlag,
+  trcSchValidateFlag,
+  errTraceFlag,
   userDirs,
   movieDirs,
   userRoutes,
