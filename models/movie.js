@@ -1,9 +1,10 @@
 const mongoose = require('mongoose');
-const validator = require('validator');
-const {
+// const validator = require('validator');
+const validators = require('mongoose-validators');
+/* const {
   linkFailMsg, NODE_ENV, envProduction, trcFlag, trcMoviesFlag, trcSchValidateFlag,
 } = require('../utils/constants');
-const { logPassLint } = require('../utils/miscutils');
+const { logPassLint } = require('../utils/miscutils'); */
 
 const movieSchema = new mongoose.Schema({
   country: {
@@ -29,35 +30,38 @@ const movieSchema = new mongoose.Schema({
   image: {
     type: String,
     required: true,
-    validate: {
+    validate: validators.isURL() /* {
       validator(lnk) {
-        if (trcFlag && trcMoviesFlag && NODE_ENV !== envProduction) logPassLint(`Movie image link test in schema: ${validator.isURL(lnk)} 4 ${lnk}`, trcSchValidateFlag);
+        if (trcFlag && trcMoviesFlag && NODE_ENV !== envProduction) logPassLint
+        (`Movie image link test in schema: ${validator.isURL(lnk)} 4 ${lnk}`, trcSchValidateFlag);
         return validator.isURL(lnk);
       },
       message: linkFailMsg,
-    },
+    } */,
   },
   trailerLink: {
     type: String,
     required: true,
-    validate: {
+    validate: validators.isURL() /* {
       validator(lnk) {
-        if (trcFlag && trcMoviesFlag && NODE_ENV !== envProduction) logPassLint(`Movie trailerLink test in schema: ${validator.isURL(lnk)} 4 ${lnk}`, trcSchValidateFlag);
+        if (trcFlag && trcMoviesFlag && NODE_ENV !== envProduction) logPassLint
+        (`Movie trailerLink test in schema: ${validator.isURL(lnk)} 4 ${lnk}`, trcSchValidateFlag);
         return validator.isURL(lnk);
       },
       message: linkFailMsg,
-    },
+    } */,
   },
   thumbnail: {
     type: String,
     required: true,
-    validate: {
+    validate: validators.isURL() /* {
       validator(lnk) {
-        if (trcFlag && trcMoviesFlag && NODE_ENV !== envProduction) logPassLint(`Movie link test in schema: ${validator.isURL(lnk)} 4 ${lnk}`, trcSchValidateFlag);
+        if (trcFlag && trcMoviesFlag && NODE_ENV !== envProduction) logPassLint
+        (`Movie link test in schema: ${validator.isURL(lnk)} 4 ${lnk}`, trcSchValidateFlag);
         return validator.isURL(lnk);
       },
       message: linkFailMsg,
-    },
+    } */,
   },
   owner: { type: mongoose.Schema.Types.ObjectId, ref: 'user', required: true },
   movieId: {
