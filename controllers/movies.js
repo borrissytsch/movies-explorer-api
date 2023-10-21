@@ -13,7 +13,7 @@ function getMovies(req, res) {
   Movie.find({ owner: { $eq: req.user._id } }).then((movieList) => {
     res.status(resOkDefault).send({ data: movieList });
   }).catch((err) => {
-    logPassLint(err, errTraceFlag);
+    if (errTraceFlag) logPassLint(err, errTraceFlag);
     res.status(errDefault.num).send({ message: errDefault.msg });
   });
 }
@@ -58,10 +58,10 @@ function createMovie(req, res) {
     });
   }).catch((err) => {
     if (err.name === errValidationErr) {
-      logPassLint(`Error ${errIncorrectData.num}: ${err}`, errTraceFlag);
+      if (errTraceFlag) logPassLint(`Error ${errIncorrectData.num}: ${err}`, errTraceFlag);
       res.status(errIncorrectData.num).send({ message: errIncorrectData.msg });
     } else {
-      logPassLint(`Error ${errDefault.num}: ${err}`, errTraceFlag);
+      if (errTraceFlag) logPassLint(`Error ${errDefault.num}: ${err}`, errTraceFlag);
       res.status(errDefault.num).send({ message: errDefault.msg });
     }
   });

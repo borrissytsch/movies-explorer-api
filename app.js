@@ -12,7 +12,7 @@ const movieRouter = require('./routes/movies');
 const {
   PORT, USERS, MOVIES, NODE_ENV, MONGODB, envProduction, DEFAULT_ALLOWED_METHODS, allowedCors,
   signInRoute, signUpRoute, errNotFound, dbgFlag, dbgNoCORSFlag, dbgNoAuthFlag, dbgNoLogFlag,
-  trcFlag,
+  trcFlag, errTraceFlag,
 } = require('./utils/constants');
 const { logger, logPassLint } = require('./utils/miscutils');
 const { login, createUser } = require('./controllers/users');
@@ -63,11 +63,11 @@ if (!dbgFlag || !dbgNoAuthFlag || NODE_ENV === envProduction) app.use(auth);
 app.use(USERS, userRouter);
 app.use(MOVIES, movieRouter);
 app.patch('/*', (req, res) => {
-  if (trcFlag && NODE_ENV !== envProduction) console.log(`App path not found: ${Object.entries(req).join('/')}`);
+  if (trcFlag && NODE_ENV !== envProduction) logPassLint(`App path not found: ${Object.entries(req).join('/')}`, errTraceFlag);
   try {
     throw new Error("Path 2 be processed doesn't exist");
   } catch (err) {
-    logPassLint(`${curDate.toLocaleString('ru-RU')} Error ${errNotFound.num}: ${err}`, true);
+    logPassLint(`${curDate.toLocaleString('ru-RU')} Error ${errNotFound.num}: ${err}`, errTraceFlag);
     res.status(errNotFound.num).send({ message: errNotFound.msg });
   }
 });

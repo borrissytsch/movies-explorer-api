@@ -23,14 +23,14 @@ const signInRoute = '/signin';
 const signUpRoute = '/signup';
 
 /* Dbg/trace config vars */
-const dbgFlag = true;
-const trcFlag = true;
+const dbgFlag = false;
+const trcFlag = false;
 const dbgNoCORSFlag = false;
 const dbgNoAuthFlag = false;
 const dbgNoLogFlag = false;
-const trcMoviesFlag = true;
-const trcSchValidateFlag = true;
-const errTraceFlag = true;
+const trcMoviesFlag = false;
+const trcSchValidateFlag = false;
+const errTraceFlag = true; // works independently from trcFlag & non production mode requirement
 
 /* Logging config consts */
 const reqLogFName = 'request.log';
@@ -44,8 +44,7 @@ const strSchPassLen = 8;
 const emailPattern = /^[a-z0-9]+[a-z0-9\-_.]*@[a-z0-9]+[a-z0-9\-_.]*\.[a-z0-9]+[a-z0-9\-_.]*$/;
 const usrEmailFailMsg = 'Field typed is not a valid e-mail address';
 const linkFailMsg = 'Incorrect link address';
-/* const urlValidOptions =
-{ protocols: ['http', 'https', 'ftp'], require_tld: true, require_protocol: false }; */
+const urlValidOptions = { protocols: ['http', 'https', 'ftp'], require_tld: true, require_protocol: true };
 
 /* CORS config consts */
 const allowedCors = [ // Массив доменов, с которых разрешены кросс-доменные запросы
@@ -143,7 +142,7 @@ module.exports = {
   idSchemaLen,
   strSchPassLen,
   emailPattern,
-  // urlValidOptions,
+  urlValidOptions,
   usrEmailFailMsg,
   linkFailMsg,
   allowedCors,

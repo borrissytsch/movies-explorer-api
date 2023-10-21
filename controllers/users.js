@@ -8,7 +8,7 @@ const ServerError = require('../errors/ServerError');
 const {
   resOkDefault, resOKCreated, errIncorrectData, errNotFound, errDefault, errValidationErr,
   errAuth, errIllegalArgsPattern, pswSoltLen, TOKEN_KEY, trcFlag, // NODE_ENV,
-  tokenDuration, NODE_ENV, envProduction,
+  tokenDuration, NODE_ENV, envProduction, errTraceFlag,
 } = require('../utils/constants');
 const { logPassLint, handleIdErr } = require('../utils/miscutils');
 
@@ -16,7 +16,7 @@ function getUsers(req, res) {
   User.find({}).then((userList) => {
     res.status(resOkDefault).send({ data: userList });
   }).catch((err) => {
-    logPassLint(err, true);
+    logPassLint(err, errTraceFlag);
     res.status(errDefault.num).send({ message: err });
   });
 }
@@ -76,7 +76,7 @@ function createUser(req, res, next) {
     if (err instanceof Error) {
       if (errIllegalArgsPattern.test(err.message)) {
         // console.log(`Illegal args: ${err.name}`);
-        logPassLint(`Error ${errIncorrectData.num}: ${err}`, true);
+        logPassLint(`Error ${errIncorrectData.num}: ${err}`, errTraceFlag);
         res.status(errIncorrectData.num).send({ message: errIncorrectData.msg });
         return;
       }
@@ -85,7 +85,7 @@ function createUser(req, res, next) {
     if (err) {
       next(err);
     } else {
-      logPassLint(`Error ${errDefault.num}: ${err}`, true);
+      logPassLint(`Error ${errDefault.num}: ${err}`, errTraceFlag);
       res.status(errDefault.num).send({ message: errDefault.msg });
     }
   });
@@ -135,8 +135,8 @@ function login(req, res) {
       maxAge: 3600000 * 24 * 7, // add a piece 4 token transfer duration
       httpOnly: true,
     }).end(); */
-  }).catch((/* err */) => {
-    // console.log(`User credentials login error ${err.name}: ${err}`);
+  }).catch((err) => {
+    logPassLint(`User credentials login error ${err.name}: ${err}`, errTraceFlag);
     res.status(errAuth.num).send({ message: errAuth.msg });
   });
 }
