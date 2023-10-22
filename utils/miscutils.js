@@ -1,13 +1,13 @@
 const {
-  errIncorrectData, errNotFound, errDefault, errCastErr, errName,
+  errIncorrectData, errNotFound, errDefault, errCastErr, errName, logFlag,
 } = require('./constants');
 
 /* Miscellaneous procedures (which haven't refed result) */
 const logPassLint = (
   msg,
-  logFlag = false,
-  msgLog = (msg2Log = msg, log2Flag = logFlag) => { if (log2Flag) console.log(msg2Log); },
-) => msgLog(msg, logFlag);
+  logPassFlag = false,
+  msgLog = (msg2Log = msg, log2Flag = logPassFlag) => { if (log2Flag) console.log(msg2Log); },
+) => msgLog(msg, logPassFlag);
 
 function handleIdErr(res, err) {
   if (err.name === errCastErr) {
@@ -23,8 +23,8 @@ function handleIdErr(res, err) {
 }
 
 /* Router common consts */
-const logger = (req, res, next, logTraceFlag = false, logTraceMsg = 'Request is logged on') => {
-  if (logTraceFlag) logPassLint(logTraceMsg, true);
+const logger = (req, res, next, logTraceFlag = logFlag, logTraceMsg = `${new Date().toLocaleString('ru-RU')} Request is logged on`) => {
+  logPassLint(logTraceMsg, logTraceFlag);
   next();
 };
 

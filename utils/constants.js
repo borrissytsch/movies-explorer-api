@@ -16,9 +16,7 @@ const {
 const userDirs = { id: 'userId', profile: 'me' };
 const movieDirs = { id: 'filmId' };
 const userRoutes = { userId: `/:${userDirs.id}`, userProfile: `/${userDirs.profile}` };
-const movieRoutes = {
-  filmId: `/:${movieDirs.id}`,
-};
+const movieRoutes = { filmId: `/:${movieDirs.id}` };
 const signInRoute = '/signin';
 const signUpRoute = '/signup';
 
@@ -33,6 +31,8 @@ const trcSchValidateFlag = false;
 const errTraceFlag = true; // works independently from trcFlag & non production mode requirement
 
 /* Logging config consts */
+const logFlag = true;
+const logErrsFlag = logFlag;
 const reqLogFName = 'request.log';
 const errLogFName = 'error.log';
 
@@ -123,6 +123,8 @@ module.exports = {
   envProduction,
   reqLogFName,
   errLogFName,
+  logFlag,
+  logErrsFlag,
   dbgFlag,
   trcFlag,
   dbgNoCORSFlag,
