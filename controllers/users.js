@@ -1,0 +1,146 @@
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const User = require('../models/user');
+
+const NotFound = require('../errors/NotFound');
+const ValidationErr = require('../errors/ValidationError');
+const ServerError = require('../errors/ServerError');
+const {
+  resOkDefault, resOKCreated, errIncorrectData, errNotFound, errDefault, errValidationErr,
+  errAuth, errIllegalArgsPattern, pswSoltLen, TOKEN_KEY, trcFlag, // NODE_ENV,
+  tokenDuration, NODE_ENV, envProduction, errTraceFlag,
+} = require('../utils/constants');
+const { logPassLint, handleIdErr } = require('../utils/miscutils');
+
+function getUsers(req, res) {
+  User.find({}).then((userList) => {
+    res.status(resOkDefault).send({ data: userList });
+  }).catch((err) => {
+    logPassLint(err, errTraceFlag);
+    res.status(errDefault.num).send({ message: err });
+  });
+}
+
+function getUserById(req, res) {
+  const { userId } = req.params;
+  User.findById(userId).then((mongUser) => {
+    if (!mongUser) return Promise.reject(new Error(errNotFound.msg));
+    const {
+      name, email, _id,
+    } = mongUser;
+    const user = {
+      name, email, _id,
+    };
+    // console.log(`User 2 send 4 response: ${Object.entries(user).join('; ')}`);
+    return res.status(resOkDefault).send({ data: user });
+  }).catch((err) => {
+    handleIdErr(res, err);
+  });
+}
+
+function getUserIInfo(req, res) {
+  // достать из obj user, доступного после аутентификации
+  if (trcFlag && NODE_ENV !== envProduction) console.log(`Get user: ${req.params} / ${req.query} / ${req.body}`);
+  const userId = req.user._id;
+  if (trcFlag && NODE_ENV !== envProduction) console.log(`Get user: ${userId}`);
+  User.findById(userId).then((mongUser) => {
+    if (!mongUser) return Promise.reject(new Error(errNotFound.msg));
+    const {
+      name, email, // _id added 2 seek _id in front @ 10/10/23
+    } = mongUser;
+    const user = {
+      name, email, _id: mongUser._id, // _id added 2 seek _id in front @ 10/10/23
+    };
+    if (trcFlag && NODE_ENV !== envProduction) console.log(`Get mongUsInfo: ${mongUser._id} / ${Object.entries(user).join('; ')}`);
+    return res.status(resOkDefault).send({ data: user });
+  }).catch((err) => {
+    if (trcFlag && NODE_ENV !== envProduction) console.log(`Get user info: ${err}`);
+    handleIdErr(res, err);
+  });
+}
+
+function createUser(req, res, next) {
+  const {
+    name, email,
+  } = req.body;
+  // console.log(`Create user starts: ${Object.entries(req.body).join(' / ')}`);
+  bcrypt.hash(req.body.password, pswSoltLen).then((password) => User.create({
+    name, email, password,
+  })).then((user) => {
+    res.status(resOKCreated).send({
+      data: {
+        name: user.name, email: user.email,
+      },
+    });
+  }).catch((err) => {
+    if (err instanceof Error) {
+      if (errIllegalArgsPattern.test(err.message)) {
+        // console.log(`Illegal args: ${err.name}`);
+        logPassLint(`Error ${errIncorrectData.num}: ${err}`, errTraceFlag);
+        res.status(errIncorrectData.num).send({ message: errIncorrectData.msg });
+        return;
+      }
+    }
+    // console.log(`Next 2 err handle middlewar'e: ${err.name}`);
+    if (err) {
+      next(err);
+    } else {
+      logPassLint(`Error ${errDefault.num}: ${err}`, errTraceFlag);
+      res.status(errDefault.num).send({ message: errDefault.msg });
+    }
+  });
+}
+
+function updateUserById(id, updateData, updateOptions = { new: true, runValidators: true }) {
+  return User.findByIdAndUpdate(id, updateData, updateOptions).then((user) => {
+    if (!user) return Promise.reject(new NotFound());
+    return Promise.resolve(user);
+  }).catch((err) => Promise.reject(err));
+}
+
+function updateProfile(req, res, next) {
+  if (trcFlag && NODE_ENV !== envProduction) console.log(`Update user profile req: ${req.user._id} / ${Object.keys(req.body).join('; ')}`);
+  const { _id } = req.user;
+  const { name, email } = req.body;
+  if (trcFlag && NODE_ENV !== envProduction) console.log(`Update user profile id: ${_id} / name: ${name} / email: ${email}`);
+  try {
+    if (!name) throw new ValidationErr();
+    updateUserById(_id, { name, email }).then((user) => {
+      if (trcFlag && NODE_ENV !== envProduction) console.log(`Update user result: ${user}`);
+      res.status(resOkDefault).send({ data: user });
+    }).catch((err) => {
+      if (err.name === errValidationErr) next(new ValidationErr());
+      if (err instanceof Error) {
+        next(err);
+      } else {
+        next(new ServerError());
+      }
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
+function login(req, res) {
+  const { email, password } = req.body;
+
+  return User.findUserByCredentials(email, password).then((user) => { // в token надо user._id
+    // console.log(`Credentials user: ${user}`); // Здeсь терн опер для dev/prod tokens
+    const token = jwt.sign({ _id: user._id }, TOKEN_KEY, { expiresIn: tokenDuration });
+    // console.log(`User credentials token: ${token}`);
+    res.status(resOkDefault).send({ token });
+    // сделать запись JWT в httpOnly куку: если не пройдёт - откатить
+    /* res.cookie('jwt', token, {
+      // maxAge: tokenDuration, // make function 4 token in sec & so on 2 ms (ms m h d)
+      maxAge: 3600000 * 24 * 7, // add a piece 4 token transfer duration
+      httpOnly: true,
+    }).end(); */
+  }).catch((err) => {
+    logPassLint(`User credentials login error ${err.name}: ${err}`, errTraceFlag);
+    res.status(errAuth.num).send({ message: errAuth.msg });
+  });
+}
+
+module.exports = {
+  getUsers, getUserById, createUser, getUserIInfo, updateProfile, login,
+};
